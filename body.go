@@ -184,6 +184,12 @@ func (body *Body) SetAngle(angle vect.Float) {
 	body.setAngle(angle)
 }
 
+func (body *Body) LookAt(pos vect.Vect) {
+	toTarget := vect.Vect{X: pos.X - body.p.X, Y: pos.Y - body.p.Y}
+	desiredAngle := math.Atan2(float64(toTarget.X), float64(toTarget.Y))
+	body.SetAngle(vect.Float(desiredAngle))
+}
+
 func (body *Body) AddAngle(angle float32) {
 	body.SetAngle(vect.Float(angle) + body.Angle())
 }
