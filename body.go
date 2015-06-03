@@ -190,9 +190,9 @@ func (body *Body) LookAt(pos vect.Vect) {
 	body.SetAngle(vect.Float(desiredAngle))
 }
 
-func (body *Body) AddAngle(angle float32) {
+/*func (body *Body) AddAngle(angle float32) {
 	body.SetAngle(vect.Float(angle) + body.Angle())
-}
+}*/
 
 func (body *Body) Mass() vect.Float {
 	return body.m
@@ -211,6 +211,10 @@ func (body *Body) BodyActivate() {
 
 	if !body.IsRogue() {
 		body.node.IdleTime = 0
+		root := body.ComponentRoot()
+		if root != nil {
+			root.ComponentActive()
+		}
 	}
 }
 
@@ -242,6 +246,17 @@ func (body *Body) ComponentActive() {
 
 	//for i,sleeping
 	//cpArrayDeleteObj(space->sleepingComponents, root);
+	foundIndex := -1
+	for i, sleepBody := range space.sleepingComponents {
+		if sleepBody == b {
+			foundIndex = i
+			break
+		}
+	}
+	if foundIndex != -1 {
+		space.sleepingComponents = append(space.sleepingComponents[:foundIndex],
+			space.sleepingComponents[foundIndex+1:]...)
+	}
 }
 
 func (body *Body) IsRogue() bool {
@@ -278,11 +293,13 @@ func (body *Body) ApplyForce(force vect.Vect, r vect.Vect) {
 }
 
 func (body *Body) AddForce(x, y float32) {
+	body.BodyActivate()
 	body.f.X += vect.Float(x)
 	body.f.Y += vect.Float(y)
 }
 
 func (body *Body) SetForce(x, y float32) {
+	body.BodyActivate()
 	body.f.X = vect.Float(x)
 	body.f.Y = vect.Float(y)
 }
