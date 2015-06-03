@@ -48,7 +48,10 @@ func normal_relative_velocity(a, b *Body, r1, r2, n vect.Vect) vect.Float {
 	return vect.Dot(relative_velocity(a, b, r1, r2), n)
 }
 
-
+func apply_impulse(body *Body, r, j vect.Vect) {
+	body.v.Add(vect.Mult(j, body.m_inv))
+	body.w += body.i_inv * vect.Cross(r, j)
+}
 
 func apply_impulses(a, b *Body, r1, r2, j vect.Vect) {
 	j1 := vect.Vect{-j.X, -j.Y}

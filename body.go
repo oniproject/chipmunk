@@ -266,6 +266,17 @@ func (body *Body) SetPosition(pos vect.Vect) {
 	body.p = pos
 }
 
+func (body *Body) ApplyImpulse(j vect.Vect, r vect.Vect) {
+	body.BodyActivate()
+	apply_impulse(body, j, r)
+}
+
+func (body *Body) ApplyForce(force vect.Vect, r vect.Vect) {
+	body.BodyActivate()
+	body.f = vect.Add(body.f, force)
+	body.t += vect.Cross(r, force)
+}
+
 func (body *Body) AddForce(x, y float32) {
 	body.f.X += vect.Float(x)
 	body.f.Y += vect.Float(y)
