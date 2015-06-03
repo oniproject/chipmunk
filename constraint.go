@@ -1,6 +1,8 @@
 package chipmunk
 
-import "github.com/vova616/chipmunk/vect"
+import (
+	. "github.com/oniproject/chipmunk/algebra"
+)
 
 const (
 	errorBias = 0.00179701029991443 //cpfpow(1.0f - 0.1f, 60.0f)
@@ -15,18 +17,18 @@ type Constraint interface {
 	Constraint() *BasicConstraint
 	PreSolve()
 	PostSolve()
-	PreStep(dt vect.Float)
-	ApplyCachedImpulse(dt_coef vect.Float)
+	PreStep(dt Float)
+	ApplyCachedImpulse(dt_coef Float)
 	ApplyImpulse()
-	Impulse() vect.Float
+	Impulse() Float
 }
 
 type BasicConstraint struct {
 	BodyA, BodyB    *Body
 	space           *Space
-	MaxForce        vect.Float
-	ErrorBias       vect.Float
-	MaxBias         vect.Float
+	MaxForce        Float
+	ErrorBias       Float
+	MaxBias         Float
 	CallbackHandler ConstraintCallback
 	UserData        Data
 }
@@ -39,11 +41,11 @@ func (this *BasicConstraint) Constraint() *BasicConstraint {
 	return this
 }
 
-func (this *BasicConstraint) PreStep(dt vect.Float) {
+func (this *BasicConstraint) PreStep(dt Float) {
 	panic("empty constraint")
 }
 
-func (this *BasicConstraint) ApplyCachedImpulse(dt_coef vect.Float) {
+func (this *BasicConstraint) ApplyCachedImpulse(dt_coef Float) {
 	panic("empty constraint")
 }
 
@@ -51,7 +53,7 @@ func (this *BasicConstraint) ApplyImpulse() {
 	panic("empty constraint")
 }
 
-func (this *BasicConstraint) Impulse() vect.Float {
+func (this *BasicConstraint) Impulse() Float {
 	panic("empty constraint")
 }
 

@@ -1,27 +1,27 @@
 package chipmunk
 
 import (
-	"github.com/vova616/chipmunk/vect"
-	//. "github.com/vova616/chipmunk/transform" 
+	. "github.com/oniproject/chipmunk/algebra"
+
 	"math"
 )
 
 type ComponentNode struct {
 	Root     *Body
 	Next     *Body
-	IdleTime vect.Float
+	IdleTime Float
 }
 
 type BodyType uint8
-type UpdatePositionFunction func(body *Body, dt vect.Float)
-type UpdateVelocityFunction func(body *Body, gravity vect.Vect, damping, dt vect.Float)
+type UpdatePositionFunction func(body *Body, dt Float)
+type UpdateVelocityFunction func(body *Body, gravity Vect, damping, dt Float)
 
 const (
 	BodyType_Static  = BodyType(0)
 	BodyType_Dynamic = BodyType(1)
 )
 
-var Inf = vect.Float(math.Inf(1))
+var Inf = Float(math.Inf(1))
 
 type CollisionCallback interface {
 	CollisionEnter(arbiter *Arbiter) bool
@@ -33,40 +33,40 @@ type CollisionCallback interface {
 type Body struct {
 	/// Mass of the body.
 	/// Must agree with cpBody.m_inv! Use cpBodySetMass() when changing the mass for this reason.
-	m vect.Float
+	m Float
 
 	/// Mass inverse.
-	m_inv vect.Float
+	m_inv Float
 
 	/// Moment of inertia of the body.
 	/// Must agree with cpBody.i_inv! Use cpBodySetMoment() when changing the moment for this reason.
-	i vect.Float
+	i Float
 	/// Moment of inertia inverse.
-	i_inv vect.Float
+	i_inv Float
 
 	/// Position of the rigid body's center of gravity.
-	p vect.Vect
+	p Vect
 	/// Velocity of the rigid body's center of gravity.
-	v vect.Vect
+	v Vect
 	/// Force acting on the rigid body's center of gravity.
-	f vect.Vect
+	f Vect
 
 	//Transform Transform
 
 	/// Rotation of the body around it's center of gravity in radians.
 	/// Must agree with cpBody.rot! Use cpBodySetAngle() when changing the angle for this reason.
-	a vect.Float
+	a Float
 	/// Angular velocity of the body around it's center of gravity in radians/second.
-	w vect.Float
+	w Float
 	/// Torque applied to the body around it's center of gravity.
-	t vect.Float
+	t Float
 
 	/// Cached unit length vector representing the angle of the body.
 	/// Used for fast rotations using cpvrotate().
-	rot vect.Vect
+	rot Vect
 
-	v_bias vect.Vect
-	w_bias vect.Float
+	v_bias Vect
+	w_bias Float
 
 	/// User definable data pointer.
 	/// Generally this points to your the game object class so you can access it
@@ -77,9 +77,9 @@ type Body struct {
 	UpdateVelocityFunc UpdateVelocityFunction
 
 	/// Maximum velocity allowed when updating the velocity.
-	v_limit vect.Float
+	v_limit Float
 	/// Maximum rotational rate (in radians/second) allowed when updating the angular velocity.
-	w_limit vect.Float
+	w_limit Float
 
 	space *Space
 
@@ -92,7 +92,7 @@ type Body struct {
 	deleted bool
 	Enabled bool
 
-	idleTime vect.Float
+	idleTime Float
 
 	IgnoreGravity bool
 }
@@ -111,7 +111,7 @@ func NewBodyStatic() (body *Body) {
 	return
 }
 
-func NewBody(mass, i vect.Float) (body *Body) {
+func NewBody(mass, i Float) (body *Body) {
 
 	body = &Body{}
 	body.Shapes = make([]*Shape, 0)
@@ -139,8 +139,8 @@ func (body *Body) Clone() *Body {
 	return &clone
 }
 
-func (body *Body) KineticEnergy() vect.Float {
-	vsq := vect.Dot(body.v, body.v)
+func (body *Body) KineticEnergy() Float {
+	vsq := Dot(body.v, body.v)
 	wsq := body.w * body.w
 	if vsq != 0 {
 		vsq = vsq * body.m
@@ -151,7 +151,7 @@ func (body *Body) KineticEnergy() vect.Float {
 	return vsq + wsq
 }
 
-func (body *Body) SetMass(mass vect.Float) {
+func (body *Body) SetMass(mass Float) {
 	if mass <= 0 {
 		panic("Mass must be positive and non-zero.")
 	}
@@ -161,7 +161,7 @@ func (body *Body) SetMass(mass vect.Float) {
 	body.m_inv = 1 / mass
 }
 
-func (body *Body) SetMoment(moment vect.Float) {
+func (body *Body) SetMoment(moment Float) {
 	if moment <= 0 {
 		panic("Moment of Inertia must be positive and non-zero.")
 	}
@@ -179,28 +179,28 @@ func (body *Body) MomentIsInf() bool {
 	return math.IsInf(float64(body.i), 0)
 }
 
-func (body *Body) SetAngle(angle vect.Float) {
+func (body *Body) SetAngle(angle Float) {
 	body.BodyActivate()
 	body.setAngle(angle)
 }
 
-func (body *Body) LookAt(pos vect.Vect) {
-	toTarget := vect.Vect{X: pos.X - body.p.X, Y: pos.Y - body.p.Y}
+func (body *Body) LookAt(pos Vect) {
+	toTarget := Vect{X: pos.X - body.p.X, Y: pos.Y - body.p.Y}
 	desiredAngle := math.Atan2(-float64(toTarget.X), float64(toTarget.Y))
-	body.SetAngle(vect.Float(desiredAngle))
+	body.SetAngle(Float(desiredAngle))
 }
 
 /*func (body *Body) AddAngle(angle float32) {
-	body.SetAngle(vect.Float(angle) + body.Angle())
+	body.SetAngle(Float(angle) + body.Angle())
 }*/
 
-func (body *Body) Mass() vect.Float {
+func (body *Body) Mass() Float {
 	return body.m
 }
 
-func (body *Body) setAngle(angle vect.Float) {
+func (body *Body) setAngle(angle Float) {
 	body.a = angle
-	body.rot = vect.FromAngle(angle)
+	body.rot = FromAngle(angle)
 }
 
 func (body *Body) BodyActivate() {
@@ -277,52 +277,52 @@ func (body *Body) UpdateShapes() {
 	}
 }
 
-func (body *Body) SetPosition(pos vect.Vect) {
+func (body *Body) SetPosition(pos Vect) {
 	body.p = pos
 }
 
-func (body *Body) ApplyImpulse(j vect.Vect, r vect.Vect) {
+func (body *Body) ApplyImpulse(j Vect, r Vect) {
 	body.BodyActivate()
 	apply_impulse(body, j, r)
 }
 
-func (body *Body) ApplyForce(force vect.Vect, r vect.Vect) {
+func (body *Body) ApplyForce(force Vect, r Vect) {
 	body.BodyActivate()
-	body.f = vect.Add(body.f, force)
-	body.t += vect.Cross(r, force)
+	body.f = Add(body.f, force)
+	body.t += Cross(r, force)
 }
 
 func (body *Body) AddForce(x, y float32) {
 	body.BodyActivate()
-	body.f.X += vect.Float(x)
-	body.f.Y += vect.Float(y)
+	body.f.X += Float(x)
+	body.f.Y += Float(y)
 }
 
 func (body *Body) SetForce(x, y float32) {
 	body.BodyActivate()
-	body.f.X = vect.Float(x)
-	body.f.Y = vect.Float(y)
+	body.f.X = Float(x)
+	body.f.Y = Float(y)
 }
 
 func (body *Body) AddVelocity(x, y float32) {
-	body.v.X += vect.Float(x)
-	body.v.Y += vect.Float(y)
+	body.v.X += Float(x)
+	body.v.Y += Float(y)
 }
 
 func (body *Body) SetVelocity(x, y float32) {
-	body.v.X = vect.Float(x)
-	body.v.Y = vect.Float(y)
+	body.v.X = Float(x)
+	body.v.Y = Float(y)
 }
 
 func (body *Body) AddTorque(t float32) {
-	body.t += vect.Float(t)
+	body.t += Float(t)
 }
 
 func (body *Body) Torque() float32 {
 	return float32(body.t)
 }
 
-func (body *Body) VBias() vect.Vect {
+func (body *Body) VBias() Vect {
 	return body.v_bias
 }
 
@@ -330,12 +330,12 @@ func (body *Body) WBias() float32 {
 	return float32(body.w_bias)
 }
 
-func (body *Body) SetVBias(v vect.Vect) {
+func (body *Body) SetVBias(v Vect) {
 	body.v_bias = v
 }
 
 func (body *Body) SetWBias(w float32) {
-	body.w_bias = vect.Float(w)
+	body.w_bias = Float(w)
 }
 
 func (body *Body) AngularVelocity() float32 {
@@ -343,26 +343,26 @@ func (body *Body) AngularVelocity() float32 {
 }
 
 func (body *Body) SetTorque(t float32) {
-	body.t = vect.Float(t)
+	body.t = Float(t)
 }
 
 func (body *Body) AddAngularVelocity(w float32) {
-	body.w += vect.Float(w)
+	body.w += Float(w)
 }
 
 func (body *Body) SetAngularVelocity(w float32) {
-	body.w = vect.Float(w)
+	body.w = Float(w)
 }
 
-func (body *Body) Velocity() vect.Vect {
+func (body *Body) Velocity() Vect {
 	return body.v
 }
 
-func (body *Body) Position() vect.Vect {
+func (body *Body) Position() Vect {
 	return body.p
 }
 
-func (body *Body) Angle() vect.Float {
+func (body *Body) Angle() Float {
 	return body.a
 }
 
@@ -370,27 +370,27 @@ func (body *Body) Rot() (rx, ry float32) {
 	return float32(body.rot.X), float32(body.rot.Y)
 }
 
-func (body *Body) UpdatePosition(dt vect.Float) {
+func (body *Body) UpdatePosition(dt Float) {
 	if body.UpdatePositionFunc != nil {
 		body.UpdatePositionFunc(body, dt)
 		return
 	}
-	body.p = vect.Add(body.p, vect.Mult(vect.Add(body.v, body.v_bias), dt))
+	body.p = Add(body.p, Mult(Add(body.v, body.v_bias), dt))
 	body.setAngle(body.a + (body.w+body.w_bias)*dt)
 
-	body.v_bias = vect.Vector_Zero
+	body.v_bias = Vector_Zero
 	body.w_bias = 0.0
 }
 
-func (body *Body) UpdateVelocity(gravity vect.Vect, damping, dt vect.Float) {
+func (body *Body) UpdateVelocity(gravity Vect, damping, dt Float) {
 	if body.UpdateVelocityFunc != nil {
 		body.UpdateVelocityFunc(body, gravity, damping, dt)
 		return
 	}
-	body.v = vect.Add(vect.Mult(body.v, damping), vect.Mult(vect.Add(gravity, vect.Mult(body.f, body.m_inv)), dt))
+	body.v = Add(Mult(body.v, damping), Mult(Add(gravity, Mult(body.f, body.m_inv)), dt))
 
 	body.w = (body.w * damping) + (body.t * body.i_inv * dt)
 
-	body.f = vect.Vector_Zero
+	body.f = Vector_Zero
 
 }

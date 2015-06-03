@@ -1,8 +1,7 @@
 package chipmunk
 
 import (
-	"github.com/vova616/chipmunk/transform"
-	"github.com/vova616/chipmunk/vect"
+	. "github.com/oniproject/chipmunk/algebra"
 )
 
 // Convenience wrapper around PolygonShape.
@@ -10,17 +9,17 @@ type BoxShape struct {
 	Shape *Shape
 	// The polygon that represents this box. Do not touch!
 	Polygon *PolygonShape
-	verts   [4]vect.Vect
+	verts   [4]Vect
 	// The width of the box. Call UpdatePoly() if changed.
-	Width vect.Float
+	Width Float
 	// The height of the box. Call UpdatePoly() if changed.
-	Height vect.Float
+	Height Float
 	// The center of the box. Call UpdatePoly() if changed.
-	Position vect.Vect
+	Position Vect
 }
 
 // Creates a new BoxShape with given position, width and height.
-func NewBox(pos vect.Vect, w, h vect.Float) *Shape {
+func NewBox(pos Vect, w, h Float) *Shape {
 	shape := newShape()
 
 	box := &BoxShape{
@@ -41,7 +40,7 @@ func NewBox(pos vect.Vect, w, h vect.Float) *Shape {
 		hh = -hh
 	}
 
-	box.verts = [4]vect.Vect{
+	box.verts = [4]Vect{
 		{-hw, -hh},
 		{-hw, hh},
 		{hw, hh},
@@ -55,8 +54,8 @@ func NewBox(pos vect.Vect, w, h vect.Float) *Shape {
 	return shape
 }
 
-func (box *BoxShape) Moment(mass float32) vect.Float {
-	return (vect.Float(mass) * (box.Width*box.Width + box.Height*box.Height) / 12.0)
+func (box *BoxShape) Moment(mass float32) Float {
+	return (Float(mass) * (box.Width*box.Width + box.Height*box.Height) / 12.0)
 }
 
 // Recalculates the internal Polygon with the Width, Height and Position.
@@ -71,7 +70,7 @@ func (box *BoxShape) UpdatePoly() {
 		hh = -hh
 	}
 
-	box.verts = [4]vect.Vect{
+	box.verts = [4]Vect{
 		{-hw, -hh},
 		{-hw, hh},
 		{hw, hh},
@@ -97,11 +96,11 @@ func (box *BoxShape) Clone(s *Shape) ShapeClass {
 }
 
 // Recalculates the transformed vertices, axes and the bounding box.
-func (box *BoxShape) update(xf transform.Transform) AABB {
+func (box *BoxShape) update(xf Transform) AABB {
 	return box.Polygon.update(xf)
 }
 
 // Returns true if the given point is located inside the box.
-func (box *BoxShape) TestPoint(point vect.Vect) bool {
+func (box *BoxShape) TestPoint(point Vect) bool {
 	return box.Polygon.TestPoint(point)
 }

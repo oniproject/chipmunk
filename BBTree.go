@@ -1,8 +1,9 @@
 package chipmunk
 
 import (
+	. "github.com/oniproject/chipmunk/algebra"
+
 	//"container/list"
-	"github.com/vova616/chipmunk/vect"
 	//"log"
 	"time"
 )
@@ -119,7 +120,7 @@ func (tree *BBTree) GetBB(obj Indexable) AABB {
 	v, ok := obj.Velocity()
 	if ok {
 		bb := obj.AABB()
-		coef := vect.Float(0.1)
+		coef := Float(0.1)
 
 		l := bb.Lower.X
 		b := bb.Lower.Y
@@ -129,9 +130,9 @@ func (tree *BBTree) GetBB(obj Indexable) AABB {
 		x := (r - l) * coef
 		y := (t - b) * coef
 
-		v = vect.Mult(v, 0.1)
+		v = Mult(v, 0.1)
 
-		return NewAABB(l+vect.FMin(-x, v.X), b+vect.FMin(-y, v.Y), r+vect.FMax(x, v.X), t+vect.FMax(y, v.Y))
+		return NewAABB(l+FMin(-x, v.X), b+FMin(-y, v.Y), r+FMax(x, v.X), t+FMax(y, v.Y))
 	}
 
 	return obj.AABB()

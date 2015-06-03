@@ -1,10 +1,10 @@
 package chipmunk
 
 import (
+	. "github.com/oniproject/chipmunk/algebra"
+
 	"errors"
 	"fmt"
-	"github.com/vova616/chipmunk/transform"
-	"github.com/vova616/chipmunk/vect"
 	//"github.com/davecgh/go-spew/spew"
 	"math"
 	"time"
@@ -19,33 +19,33 @@ type Space struct {
 	Iterations int
 
 	/// Gravity to pass to rigid bodies when integrating velocity.
-	Gravity vect.Vect
+	Gravity Vect
 
 	/// Damping rate expressed as the fraction of velocity bodies retain each second.
 	/// A value of 0.9 would mean that each body's velocity will drop 10% per second.
 	/// The default value is 1.0, meaning no damping is applied.
 	/// @note This damping value is different than those of cpDampedSpring and cpDampedRotarySpring.
-	Damping vect.Float
+	Damping Float
 
 	/// Speed threshold for a body to be considered idle.
 	/// The default value of 0 means to let the space guess a good threshold based on gravity.
-	idleSpeedThreshold vect.Float
+	idleSpeedThreshold Float
 
 	/// Time a group of bodies must remain idle in order to fall asleep.
 	/// Enabling sleeping also implicitly enables the the contact graph.
 	/// The default value of INFINITY disables the sleeping algorithm.
-	sleepTimeThreshold vect.Float
+	sleepTimeThreshold Float
 
 	/// Amount of encouraged penetration between colliding shapes.
 	/// Used to reduce oscillating contacts and keep the collision cache warm.
 	/// Defaults to 0.1. If you have poor simulation quality,
 	/// increase this number as much as possible without allowing visible amounts of overlap.
-	collisionSlop vect.Float
+	collisionSlop Float
 
 	/// Determines how fast overlapping shapes are pushed apart.
 	/// Expressed as a fraction of the error remaining after each second.
 	/// Defaults to pow(1.0 - 0.1, 60.0) meaning that Chipmunk fixes 10% of overlap each frame at 60Hz.
-	collisionBias vect.Float
+	collisionBias Float
 
 	/// Number of frames that contact information should persist.
 	/// Defaults to 3. There is probably never a reason to change this value.
@@ -55,7 +55,7 @@ type Space struct {
 	/// Disabled by default for a small performance boost. Enabled implicitly when the sleeping feature is enabled.
 	enableContactGraph bool
 
-	curr_dt vect.Float
+	curr_dt Float
 
 	Constraints []Constraint
 
@@ -95,12 +95,12 @@ func NewSpace() (space *Space) {
 	space = &Space{}
 	space.Iterations = 20
 
-	space.Gravity = vect.Vector_Zero
+	space.Gravity = Vector_Zero
 
 	space.Damping = 1
 
 	space.collisionSlop = 0.5
-	space.collisionBias = vect.Float(math.Pow(1.0-0.1, 60))
+	space.collisionBias = Float(math.Pow(1.0-0.1, 60))
 	space.collisionPersistence = 3
 
 	space.Constraints = make([]Constraint, 0)
@@ -153,7 +153,7 @@ func (space *Space) Destroy() {
 	space.ContactBuffer = nil
 }
 
-func (space *Space) Step(dt vect.Float) {
+func (space *Space) Step(dt Float) {
 
 	// don't step if the timestep is 0!
 	if dt == 0 {
@@ -220,8 +220,8 @@ func (space *Space) Step(dt vect.Float) {
 	}
 
 	slop := space.collisionSlop
-	biasCoef := vect.Float(1.0 - math.Pow(float64(space.collisionBias), float64(dt)))
-	invdt := vect.Float(1 / dt)
+	biasCoef := Float(1.0 - math.Pow(float64(space.collisionBias), float64(dt)))
+	invdt := Float(1 / dt)
 	for _, arb := range space.Arbiters {
 		arb.preStep(invdt, slop, biasCoef)
 	}
@@ -231,19 +231,19 @@ func (space *Space) Step(dt vect.Float) {
 		con.PreStep(dt)
 	}
 
-	Damping := vect.Float(math.Pow(float64(space.Damping), float64(dt)))
+	Damping := Float(math.Pow(float64(space.Damping), float64(dt)))
 
 	for _, body := range bodies {
 		if body.Enabled {
 			if body.IgnoreGravity {
-				body.UpdateVelocity(vect.Vector_Zero, damping, dt)
+				body.UpdateVelocity(Vector_Zero, damping, dt)
 				continue
 			}
 			body.UpdateVelocity(space.Gravity, damping, dt)
 		}
 	}
 
-	dt_coef := vect.Float(0)
+	dt_coef := Float(0)
 	if prev_dt != 0 {
 		dt_coef = dt / prev_dt
 	}
@@ -357,7 +357,7 @@ func (space *Space) QueryStatic(obj Indexable, aabb AABB, fnc SpatialIndexQueryF
 	space.staticShapes.Query(obj, aabb, fnc)
 }
 
-func (space *Space) SpacePointQueryFirst(point vect.Vect, layers Layer, group Group, checkSensors bool) (shape *Shape) {
+func (space *Space) SpacePointQueryFirst(point Vect, layers Layer, group Group, checkSensors bool) (shape *Shape) {
 
 	found := false
 	pointFunc := func(a, b Indexable) {
@@ -381,8 +381,8 @@ func (space *Space) SpacePointQueryFirst(point vect.Vect, layers Layer, group Gr
 		}
 	}
 
-	dot := NewCircle(vect.Vector_Zero, 0.5)
-	dot.BB = dot.update(transform.NewTransform(point, 0))
+	dot := NewCircle(Vector_Zero, 0.5)
+	dot.BB = dot.update(NewTransform(point, 0))
 	dot.Layer = layers
 	dot.Group = group
 	space.staticShapes.Query(dot, dot.AABB(), pointFunc)
@@ -394,7 +394,7 @@ func (space *Space) SpacePointQueryFirst(point vect.Vect, layers Layer, group Gr
 	return
 }
 
-func (space *Space) SpacePointQuery(point vect.Vect, layers Layer, group Group, checkSensors bool) (shapes []*Shape) {
+func (space *Space) SpacePointQuery(point Vect, layers Layer, group Group, checkSensors bool) (shapes []*Shape) {
 
 	pointFunc := func(a, b Indexable) {
 		shapeB := b.Shape()
@@ -413,8 +413,8 @@ func (space *Space) SpacePointQuery(point vect.Vect, layers Layer, group Group, 
 		}
 	}
 
-	dot := NewCircle(vect.Vector_Zero, 0.5)
-	dot.BB = dot.update(transform.NewTransform(point, 0))
+	dot := NewCircle(Vector_Zero, 0.5)
+	dot.BB = dot.update(NewTransform(point, 0))
 	dot.Layer = layers
 	dot.Group = group
 	space.staticShapes.Query(dot, dot.AABB(), pointFunc)
@@ -424,7 +424,7 @@ func (space *Space) SpacePointQuery(point vect.Vect, layers Layer, group Group, 
 }
 
 /*
-func (space *Space) SpacePointQuery(point vect.Vect, layers Layer, group Group, cpSpacePointQueryFunc func, void *data)
+func (space *Space) SpacePointQuery(point Vect, layers Layer, group Group, cpSpacePointQueryFunc func, void *data)
 {
 	struct PointQueryContext context = {point, layers, group, func, data};
 	cpBB bb = cpBBNewForCircle(point, 0.0f);
@@ -476,14 +476,14 @@ func (space *Space) ActiveBody(body *Body) error {
 	return nil
 }
 
-func (space *Space) ProcessComponents(dt vect.Float) {
+func (space *Space) ProcessComponents(dt Float) {
 
 	sleep := math.IsInf(float64(space.sleepTimeThreshold), 0)
 	bodies := space.Bodies
 	_ = bodies
 	if sleep {
 		dv := space.idleSpeedThreshold
-		dvsq := vect.Float(0)
+		dvsq := Float(0)
 		if dv == 0 {
 			dvsq = dv * dv
 		} else {
@@ -491,7 +491,7 @@ func (space *Space) ProcessComponents(dt vect.Float) {
 		}
 
 		for _, body := range space.Bodies {
-			keThreshold := vect.Float(0)
+			keThreshold := Float(0)
 			if dvsq != 0 {
 				keThreshold = body.m * dvsq
 			}
@@ -592,7 +592,7 @@ func (space *Space) CreateArbiter(sa, sb *Shape) *Arbiter {
 	arb.BodyA = arb.ShapeA.Body
 	arb.BodyB = arb.ShapeB.Body
 
-	arb.Surface_vr = vect.Vect{}
+	arb.Surface_vr = Vect{}
 	arb.stamp = 0
 	//arb.nodeA = new(ArbiterEdge)
 	//arb.nodeB = new(ArbiterEdge)

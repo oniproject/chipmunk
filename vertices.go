@@ -1,11 +1,11 @@
 package chipmunk
 
 import ( 
-	"github.com/vova616/chipmunk/vect"
+	. "github.com/oniproject/chipmunk/algebra"
 )
 
-// Wrapper around []vect.Vect.
-type Vertices []vect.Vect
+// Wrapper around []Vect.
+type Vertices []Vect
 
 // Checks if verts forms a valid polygon.
 // The vertices must be convex and winded clockwise.
@@ -16,7 +16,7 @@ func (verts Vertices) ValidatePolygon() bool {
 		b := verts[(i+1)%numVerts]
 		c := verts[(i+2)%numVerts]
 
-		if vect.Cross(vect.Sub(b, a), vect.Sub(c, b)) > 0.0 {
+		if Cross(Sub(b, a), Sub(c, b)) > 0.0 {
 			return false
 		}
 	}

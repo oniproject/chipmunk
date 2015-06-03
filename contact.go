@@ -1,23 +1,23 @@
 package chipmunk
 
 import (
-	"github.com/vova616/chipmunk/vect"
+	. "github.com/oniproject/chipmunk/algebra"
 )
 
 type Contact struct {
-	p, n vect.Vect
-	dist vect.Float
+	p, n Vect
+	dist Float
 
-	r1, r2               vect.Vect
-	nMass, tMass, bounce vect.Float
+	r1, r2               Vect
+	nMass, tMass, bounce Float
 
-	jnAcc, jtAcc, jBias vect.Float
-	bias                vect.Float
+	jnAcc, jtAcc, jBias Float
+	bias                Float
 
 	hash HashValue
 }
 
-func (con *Contact) reset(pos, norm vect.Vect, dist vect.Float, hash HashValue) {
+func (con *Contact) reset(pos, norm Vect, dist Float, hash HashValue) {
 	con.p = pos
 	con.n = norm
 	con.dist = dist
@@ -28,10 +28,10 @@ func (con *Contact) reset(pos, norm vect.Vect, dist vect.Float, hash HashValue) 
 	con.jBias = 0.0
 }
 
-func (con *Contact) Normal() vect.Vect {
+func (con *Contact) Normal() Vect {
 	return con.n
 }
 
-func (con *Contact) Position() vect.Vect {
+func (con *Contact) Position() Vect {
 	return con.p
 }

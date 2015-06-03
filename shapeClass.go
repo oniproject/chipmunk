@@ -1,8 +1,7 @@
 package chipmunk
 
 import (
-	"github.com/vova616/chipmunk/transform"
-	"github.com/vova616/chipmunk/vect"
+	. "github.com/oniproject/chipmunk/algebra"
 )
 
 type ShapeType int
@@ -34,11 +33,11 @@ func (st ShapeType) ToString() string {
 type ShapeClass interface {
 	ShapeType() ShapeType
 	// Update the shape with the new transform and compute the AABB.
-	update(xf transform.Transform) AABB
+	update(xf Transform) AABB
 	// Returns if the given point is located inside the shape.
-	TestPoint(point vect.Vect) bool
+	TestPoint(point Vect) bool
 
-	Moment(mass float32) vect.Float
+	Moment(mass float32) Float
 
 	Clone(s *Shape) ShapeClass
 	//marshalShape(shape *Shape) ([]byte, error)

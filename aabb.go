@@ -1,13 +1,13 @@
 package chipmunk
 
 import (
-	"github.com/vova616/chipmunk/vect"
+	. "github.com/oniproject/chipmunk/algebra"
 )
 
 //axis aligned bounding box.
 type AABB struct {
 	Lower, //l b
-	Upper vect.Vect // r t
+	Upper Vect // r t
 }
 
 /*
@@ -21,13 +21,13 @@ func (aabb *AABB) Valid() bool {
 	return aabb.Lower.X <= aabb.Upper.X && aabb.Lower.Y <= aabb.Upper.Y
 }
 
-func NewAABB(l, b, r, t vect.Float) AABB {
-	return AABB{vect.Vect{l, b}, vect.Vect{r, t}}
+func NewAABB(l, b, r, t Float) AABB {
+	return AABB{Vect{l, b}, Vect{r, t}}
 }
 
 //returns the center of the aabb
-func (aabb *AABB) Center() vect.Vect {
-	return vect.Mult(vect.Add(aabb.Lower, aabb.Upper), 0.5)
+func (aabb *AABB) Center() Vect {
+	return Mult(Add(aabb.Lower, aabb.Upper), 0.5)
 }
 
 //returns if other is contained inside this aabb.
@@ -47,71 +47,71 @@ func (aabb *AABB) ContainsPtr(other *AABB) bool {
 }
 
 //returns if v is contained inside this aabb.
-func (aabb *AABB) ContainsVect(v vect.Vect) bool {
+func (aabb *AABB) ContainsVect(v Vect) bool {
 	return aabb.Lower.X <= v.X &&
 		aabb.Upper.X >= v.X &&
 		aabb.Lower.Y <= v.Y &&
 		aabb.Upper.Y >= v.Y
 }
 
-func (aabb *AABB) Extents() vect.Vect {
-	return vect.Mult(vect.Sub(aabb.Upper, aabb.Lower), .5)
+func (aabb *AABB) Extents() Vect {
+	return Mult(Sub(aabb.Upper, aabb.Lower), .5)
 }
 
-func (aabb *AABB) Perimeter() vect.Float {
-	w := vect.Sub(aabb.Upper, aabb.Lower)
+func (aabb *AABB) Perimeter() Float {
+	w := Sub(aabb.Upper, aabb.Lower)
 	return 2 * (w.X + w.Y)
 }
 
 //returns an AABB that holds both a and b.
 func Combine(a, b AABB) AABB {
 	return AABB{
-		vect.Min(a.Lower, b.Lower),
-		vect.Max(a.Upper, b.Upper),
+		Min(a.Lower, b.Lower),
+		Max(a.Upper, b.Upper),
 	}
 }
 
 //returns an AABB that holds both a and b.
 func CombinePtr(a, b *AABB) AABB {
 	return AABB{
-		vect.Min(a.Lower, b.Lower),
-		vect.Max(a.Upper, b.Upper),
+		Min(a.Lower, b.Lower),
+		Max(a.Upper, b.Upper),
 	}
 }
 
 //returns an AABB that holds both a and v.
-func Expand(a AABB, v vect.Vect) AABB {
+func Expand(a AABB, v Vect) AABB {
 	return AABB{
-		vect.Min(a.Lower, v),
-		vect.Max(a.Upper, v),
+		Min(a.Lower, v),
+		Max(a.Upper, v),
 	}
 }
 
 //returns the area of the bounding box.
-func (aabb *AABB) Area() vect.Float {
+func (aabb *AABB) Area() Float {
 	return (aabb.Upper.X - aabb.Lower.X) * (aabb.Upper.Y - aabb.Lower.Y)
 }
 
-func MergedArea(a, b AABB) vect.Float {
-	return (vect.FMax(a.Upper.X, b.Upper.X) - vect.FMin(a.Lower.X, b.Lower.X)) * (vect.FMax(a.Upper.Y, b.Upper.Y) - vect.FMin(a.Lower.Y, b.Lower.Y))
+func MergedArea(a, b AABB) Float {
+	return (FMax(a.Upper.X, b.Upper.X) - FMin(a.Lower.X, b.Lower.X)) * (FMax(a.Upper.Y, b.Upper.Y) - FMin(a.Lower.Y, b.Lower.Y))
 }
 
-func MergedAreaPtr(a, b *AABB) vect.Float {
-	return (vect.FMax(a.Upper.X, b.Upper.X) - vect.FMin(a.Lower.X, b.Lower.X)) * (vect.FMax(a.Upper.Y, b.Upper.Y) - vect.FMin(a.Lower.Y, b.Lower.Y))
+func MergedAreaPtr(a, b *AABB) Float {
+	return (FMax(a.Upper.X, b.Upper.X) - FMin(a.Lower.X, b.Lower.X)) * (FMax(a.Upper.Y, b.Upper.Y) - FMin(a.Lower.Y, b.Lower.Y))
 }
 
-func ProximityPtr(a, b *AABB) vect.Float {
-	return vect.FAbs(a.Lower.X+a.Upper.X-b.Lower.X-b.Upper.X) + vect.FAbs(a.Lower.Y+a.Upper.Y-b.Lower.Y-b.Upper.Y)
+func ProximityPtr(a, b *AABB) Float {
+	return FAbs(a.Lower.X+a.Upper.X-b.Lower.X-b.Upper.X) + FAbs(a.Lower.Y+a.Upper.Y-b.Lower.Y-b.Upper.Y)
 }
 
-func Proximity(a, b AABB) vect.Float {
-	return vect.FAbs(a.Lower.X+a.Upper.X-b.Lower.X-b.Upper.X) + vect.FAbs(a.Lower.Y+a.Upper.Y-b.Lower.Y-b.Upper.Y)
+func Proximity(a, b AABB) Float {
+	return FAbs(a.Lower.X+a.Upper.X-b.Lower.X-b.Upper.X) + FAbs(a.Lower.Y+a.Upper.Y-b.Lower.Y-b.Upper.Y)
 }
 
 func TestOverlap2(a, b AABB) bool {
 
-	d1 := vect.Sub(b.Lower, a.Upper)
-	d2 := vect.Sub(a.Lower, b.Upper)
+	d1 := Sub(b.Lower, a.Upper)
+	d2 := Sub(a.Lower, b.Upper)
 
 	if d1.X > 0.0 || d1.Y > 0.0 {
 		return false
